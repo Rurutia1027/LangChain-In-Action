@@ -6,12 +6,21 @@ import {
     SystemMessage, 
 } from "@langchain/core/messages"; 
 import { StringOutputParser } from "@langchain/core/output_parsers"; 
+
+function createModel(temperature: number) {
+    return new ChatOpenAI({
+        model: "deepseek-chat",
+        temperature,
+        apiKey: process.env.DEEPSEEK_API_KEY,
+        configuration: {
+            baseURL: process.env.DEEPSEEK_BASE_URL,
+        },
+    });
+}
+
 async function basicInvoke() {
     console.log("==== basic invoke ===="); 
-    const model = new ChatOpenAI({
-        model: "gpt-4o-mini", 
-        temperature: 0,  
-    }); 
+    const model = createModel(0); 
 
     const response = await model.invoke([
         new SystemMessage("you are a kind AI assistant, please answer in English"), 
@@ -26,10 +35,7 @@ async function basicInvoke() {
 // streaming output: print token by token 
 async function streamingOutput() {
     console.log("==== streaming output ===="); 
-    const model = new ChatOpenAI({
-        model: "gpt-4o-mini", 
-        temperature: 0.7, 
-    }); 
+    const model = createModel(0.7); 
 
     const stream = await model.stream([
         new HumanMessage("Write a short story about a cat"),
@@ -44,10 +50,7 @@ async function streamingOutput() {
 
 async function chainExample() {
     console.log("==== chain example ===="); 
-    const model = new ChatOpenAI({
-        model: "gpt-4o-mini", 
-        temperature: 0, 
-    }); 
+    const model = createModel(0); 
 
     // here we use pipe() connect model and output parser into chain 
     const chain = model.pipe(new StringOutputParser()); 
